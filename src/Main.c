@@ -15,9 +15,9 @@ void Setup(AlxWindow* w){
         (float)GetWidth() / (float)GetHeight()
     );
     
-    path = (CRSpline){ Vector_New(sizeof(Vec2)) };
+    path = CRSpline_New();
     for(int i = 0;i<20;i++){
-        Vector_Push(&path.points,(Vec2[]){(Vec2){i*10,i*5}});
+        Vector_Push(&path,(Vec2[]){(Vec2){i*10,i*5}});
     }
 
     curve = (BCurve){ { 300.0f,300.0f },{ 600.0f,300.0f },{ 500.0f,500.0f } };
@@ -48,11 +48,11 @@ void Update(AlxWindow* w){
     BCurve_Render_GT_TV(WINDOW_STD_ARGS,&tv,&curve,Ship - (int)Ship,4.0f,WHITE);
 
     Ship += 0.1f * w->ElapsedTime;
-    Ship = Ship>path.points.size?0.0f:Ship;
+    Ship = Ship>path.size?0.0f:Ship;
 }
 
 void Delete(AlxWindow* w){
-    Vector_Free(&path.points);
+    Vector_Free(&path);
 }
 
 int main(){
