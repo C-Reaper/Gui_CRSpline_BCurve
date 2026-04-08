@@ -57,6 +57,7 @@ void Update(AlxWindow* w){
     BCurve_Render_GT_TV(WINDOW_STD_ARGS,&tv,&curve,Ship1,4.0f,WHITE);
 
     const float len = CRSpline_Length(&path,Ship0,0.0001f,1) / CRSpline_AbsLength(&path,0.0001f,1);
+    //const float len = CRSpline_Length(&path,Ship0,0.0001f,1);
     Ship0 += Ship0_speed / len * w->ElapsedTime;
     Ship0 = Ship0>path.size ? 0.0f : Ship0;
 
