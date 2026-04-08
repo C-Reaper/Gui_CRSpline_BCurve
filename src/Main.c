@@ -5,7 +5,11 @@ TransformedView tv;
 CRSpline path;
 BCurve curve;
 Vec2* pSelected = NULL;
-float Ship = 0.0f;
+
+float Ship0 = 0.0f;
+float Ship1 = 0.0f;
+float Ship0_speed = 1.0f;
+float Ship1_speed = 1.0f;
 
 void Setup(AlxWindow* w){
     tv = TransformedView_Make(
@@ -38,17 +42,29 @@ void Update(AlxWindow* w){
             pSelected->y = m.y;
         }
     }
-    
+
+    if(Stroke(ALX_KEY_W).DOWN)      Ship0_speed *= 1.01f;
+    if(Stroke(ALX_KEY_S).DOWN)      Ship0_speed *= 0.99f;
+    if(Stroke(ALX_KEY_UP).DOWN)     Ship1_speed *= 1.01f;
+    if(Stroke(ALX_KEY_DOWN).DOWN)   Ship1_speed *= 0.99f;
+
     Clear(BLACK);
 
     CRSpline_Render_CP_TV(WINDOW_STD_ARGS,&tv,&path,1,RED,1.0f,WHITE);
     BCurve_Render_CP_TV(WINDOW_STD_ARGS,&tv,&curve,BLUE,1.0f,WHITE);
 
-    CRSpline_Render_GT_TV(WINDOW_STD_ARGS,&tv,&path,1,Ship,4.0f,WHITE);
-    BCurve_Render_GT_TV(WINDOW_STD_ARGS,&tv,&curve,Ship - (int)Ship,4.0f,WHITE);
+    CRSpline_Render_GT_TV(WINDOW_STD_ARGS,&tv,&path,1,Ship0,4.0f,WHITE);
+    BCurve_Render_GT_TV(WINDOW_STD_ARGS,&tv,&curve,Ship1,4.0f,WHITE);
 
-    Ship += 0.1f * w->ElapsedTime;
-    Ship = Ship>path.size?0.0f:Ship;
+    const float len = CRSpline_Length(&path,Ship0,0.0001f,1) / CRSpline_AbsLength(&path,0.0001f,1);
+    Ship0 += Ship0_speed / len * w->ElapsedTime;
+    Ship0 = Ship0>path.size ? 0.0f : Ship0;
+
+    Ship1 += Ship1_speed * w->ElapsedTime;
+    Ship1 = Ship1 - (int)Ship1;
+
+    CStr_RenderAlxFontf(WINDOW_STD_ARGS,GetAlxFont(),0.0f,0.0f,RED,"P: %f | %f",Ship0,Ship1);
+    CStr_RenderAlxFontf(WINDOW_STD_ARGS,GetAlxFont(),0.0f,GetAlxFont()->CharSizeY,RED,"S: %f | %f",Ship0_speed,Ship1_speed);
 }
 
 void Delete(AlxWindow* w){
@@ -56,7 +72,7 @@ void Delete(AlxWindow* w){
 }
 
 int main(){
-    if(Create("Splines",800,600,2,2,Setup,Update,Delete))
+    if(Create("Splines",1900,1000,1,1,Setup,Update,Delete))
         Start();
     return 0;
 }
